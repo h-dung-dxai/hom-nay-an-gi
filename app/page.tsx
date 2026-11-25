@@ -5,7 +5,7 @@ import { RotateCw, Soup } from "lucide-react";
 import { DishCard } from "@/components/DishCard";
 import { MealChips } from "@/components/MealChips";
 import { mealFromHour, type Meal } from "@/lib/meal";
-import type { Dish, Suggestion } from "@/lib/suggestion";
+import { errorText, FALLBACK_ERROR, recentExclude, type Dish, type Suggestion } from "@/lib/suggestion";
 
 type Status = "loading" | "ready" | "error";
 
@@ -20,20 +20,24 @@ export default function Home() {
 
   const fetchSuggestion = useCallback(async (m: Meal) => {
     setStatus("loading");
+    let message = FALLBACK_ERROR;
     try {
       const res = await fetch("/api/suggest", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ meal: m, localTime: hhmm(new Date()), exclude: shown.current }),
+        body: JSON.stringify({ meal: m, localTime: hhmm(new Date()), exclude: recentExclude(shown.current) }),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error);
+      const data = await res.json().catch(() => null);
+      if (!res.ok || !data) {
+        message = errorText(data);
+        throw new Error(message);
+      }
       const s = data as Suggestion;
       shown.current.push(s.main.name, ...s.alternatives.map((d) => d.name));
       setSuggestion(s);
       setStatus("ready");
-    } catch (e) {
-      setError(e instanceof Error && e.message ? e.message : "Không gợi ý được, thử lại nhé");
+    } catch {
+      setError(message); // never show raw fetch/JSON errors (often English) to the user
       setStatus("error");
     }
   }, []);

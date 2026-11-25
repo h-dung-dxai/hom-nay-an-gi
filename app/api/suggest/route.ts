@@ -1,14 +1,14 @@
 import { z } from "zod";
-import { cleanSuggestion } from "@/lib/suggestion";
+import { cleanSuggestion, FALLBACK_ERROR, MAX_EXCLUDE } from "@/lib/suggestion";
 import { suggestDish } from "@/lib/server/openai";
 
 const Body = z.object({
   meal: z.enum(["sang", "trua", "xe", "toi", "khuya"]),
   localTime: z.string().regex(/^\d{2}:\d{2}$/),
-  exclude: z.array(z.string().max(100)).max(100),
+  exclude: z.array(z.string().max(100)).max(MAX_EXCLUDE),
 });
 
-const FAIL = { error: "Không gợi ý được, thử lại nhé" };
+const FAIL = { error: FALLBACK_ERROR };
 
 export async function POST(request: Request) {
   const body = Body.safeParse(await request.json().catch(() => null));
