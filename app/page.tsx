@@ -1,69 +1,120 @@
-import Image from "next/image";
+"use client";
+
+import { useCallback, useEffect, useRef, useState } from "react";
+import { DishCard } from "@/components/DishCard";
+import { MealChips } from "@/components/MealChips";
+import { mealFromHour, type Meal } from "@/lib/meal";
+import type { Dish, Suggestion } from "@/lib/suggestion";
+
+type Status = "loading" | "ready" | "error";
+
+const hhmm = (d: Date) => `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
 
 export default function Home() {
+  const [meal, setMeal] = useState<Meal | null>(null);
+  const [suggestion, setSuggestion] = useState<Suggestion | null>(null);
+  const [status, setStatus] = useState<Status>("loading");
+  const [error, setError] = useState("");
+  const shown = useRef<string[]>([]); // every dish shown this session for this meal
+
+  const fetchSuggestion = useCallback(async (m: Meal) => {
+    setStatus("loading");
+    try {
+      const res = await fetch("/api/suggest", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ meal: m, localTime: hhmm(new Date()), exclude: shown.current }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      const s = data as Suggestion;
+      shown.current.push(s.main.name, ...s.alternatives.map((d) => d.name));
+      setSuggestion(s);
+      setStatus("ready");
+    } catch (e) {
+      setError(e instanceof Error && e.message ? e.message : "Không gợi ý được, thử lại nhé");
+      setStatus("error");
+    }
+  }, []);
+
+  const pickMeal = useCallback(
+    (m: Meal) => {
+      setMeal(m);
+      shown.current = [];
+      fetchSuggestion(m);
+    },
+    [fetchSuggestion],
+  );
+
+  // Meal comes from the device clock, so it must be computed after hydration, in the browser.
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    pickMeal(mealFromHour(new Date().getHours()));
+  }, [pickMeal]);
+
+  const swap = (alt: Dish) => {
+    if (!suggestion) return;
+    const { main } = suggestion;
+    setSuggestion({
+      main: { ...alt, reason: alt.reason ?? "Đổi gió với món này nhé!" },
+      alternatives: suggestion.alternatives.map((d) => (d === alt ? main : d)),
+    });
+  };
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+    <main className="mx-auto flex w-full max-w-[480px] flex-col gap-6 px-4 py-10">
+      <header className="text-center">
+        <h1 className="text-3xl font-extrabold">Hôm nay ăn gì? 🍜</h1>
+        <p className="mt-1 text-sm opacity-70">Để mình chọn giúp bạn</p>
+      </header>
+
+      <MealChips active={meal} onPick={pickMeal} disabled={status === "loading"} />
+
+      <div aria-live="polite">
+        {status === "loading" && (
+          <div className="h-48 animate-pulse rounded-3xl bg-orange-100 dark:bg-stone-800" aria-label="Đang chọn món" />
+        )}
+        {status === "error" && (
+          <div className="rounded-3xl bg-red-50 p-6 text-center dark:bg-red-950">
+            <p>{error}</p>
+            <button
+              type="button"
+              onClick={() => meal && fetchSuggestion(meal)}
+              className="mt-4 min-h-11 rounded-full bg-orange-600 px-5 font-semibold text-white"
             >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+              Thử lại
+            </button>
+          </div>
+        )}
+        {status === "ready" && suggestion && <DishCard main={suggestion.main} />}
+      </div>
+
+      {status === "ready" && suggestion && (
+        <>
+          {suggestion.alternatives.length > 0 && (
+            <div className="flex flex-wrap items-center justify-center gap-2 text-sm">
+              <span className="opacity-70">Hoặc:</span>
+              {suggestion.alternatives.map((d) => (
+                <button
+                  key={d.name}
+                  type="button"
+                  onClick={() => swap(d)}
+                  className="min-h-11 rounded-full border border-orange-300 px-4 hover:bg-orange-50 dark:border-stone-700 dark:hover:bg-stone-800"
+                >
+                  {d.name}
+                </button>
+              ))}
+            </div>
+          )}
+          <button
+            type="button"
+            onClick={() => meal && fetchSuggestion(meal)}
+            className="mx-auto min-h-12 rounded-full bg-orange-600 px-8 text-lg font-semibold text-white shadow hover:bg-orange-700"
           >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+            🔄 Đổi món
+          </button>
+        </>
+      )}
+    </main>
   );
 }
