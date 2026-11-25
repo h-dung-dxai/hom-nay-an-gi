@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { RotateCw, Soup } from "lucide-react";
 import { DishCard } from "@/components/DishCard";
 import { MealChips } from "@/components/MealChips";
 import { mealFromHour, type Meal } from "@/lib/meal";
@@ -64,7 +65,9 @@ export default function Home() {
   return (
     <main className="mx-auto flex w-full max-w-[480px] flex-col gap-6 px-4 py-10">
       <header className="text-center">
-        <h1 className="text-3xl font-extrabold">Hôm nay ăn gì? 🍜</h1>
+        <h1 className="flex items-center justify-center gap-2 text-3xl font-extrabold">
+          Hôm nay ăn gì? <Soup aria-hidden className="size-8 text-orange-600" />
+        </h1>
         <p className="mt-1 text-sm opacity-70">Để mình chọn giúp bạn</p>
       </header>
 
@@ -80,9 +83,9 @@ export default function Home() {
             <button
               type="button"
               onClick={() => meal && fetchSuggestion(meal)}
-              className="mt-4 min-h-11 rounded-full bg-orange-600 px-5 font-semibold text-white"
+              className="mt-4 inline-flex min-h-11 items-center gap-2 rounded-full bg-orange-600 px-5 font-semibold text-white"
             >
-              Thử lại
+              <RotateCw aria-hidden className="size-4" /> Thử lại
             </button>
           </div>
         )}
@@ -109,9 +112,9 @@ export default function Home() {
           <button
             type="button"
             onClick={() => meal && fetchSuggestion(meal)}
-            className="mx-auto min-h-12 rounded-full bg-orange-600 px-8 text-lg font-semibold text-white shadow hover:bg-orange-700"
+            className="mx-auto inline-flex min-h-12 items-center gap-2 rounded-full bg-orange-600 px-8 text-lg font-semibold text-white shadow hover:bg-orange-700"
           >
-            🔄 Đổi món
+            <RotateCw aria-hidden className="size-5" /> Đổi món
           </button>
         </>
       )}

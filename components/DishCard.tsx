@@ -1,3 +1,4 @@
+import { MapPin } from "lucide-react";
 import { mapsSearchUrl } from "@/lib/maps";
 import type { Suggestion } from "@/lib/suggestion";
 
@@ -12,7 +13,7 @@ export function DishCard({ main }: { main: Suggestion["main"] }) {
         rel="noopener noreferrer"
         className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-full bg-emerald-600 px-5 font-semibold text-white hover:bg-emerald-700"
       >
-        📍 Tìm quán gần đây
+        <MapPin aria-hidden className="size-5" /> Tìm quán gần đây
       </a>
     </section>
   );
