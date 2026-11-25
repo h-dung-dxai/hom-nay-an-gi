@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { RotateCw, Soup } from "lucide-react";
 import { DishCard } from "@/components/DishCard";
+import { DishThumb } from "@/components/DishImage";
 import { MealChips } from "@/components/MealChips";
 import { mealFromHour, type Meal } from "@/lib/meal";
 import { errorText, FALLBACK_ERROR, recentExclude, type Dish, type Suggestion } from "@/lib/suggestion";
@@ -107,8 +108,9 @@ export default function Home() {
                   key={d.name}
                   type="button"
                   onClick={() => swap(d)}
-                  className="min-h-11 rounded-full border border-line bg-paper px-4 transition hover:border-turmeric hover:text-chili"
+                  className="inline-flex min-h-11 items-center gap-2 rounded-full border border-line bg-paper py-1 pl-1.5 pr-4 transition hover:border-turmeric hover:text-chili"
                 >
+                  <DishThumb keyword={d.searchKeyword} />
                   {d.name}
                 </button>
               ))}
