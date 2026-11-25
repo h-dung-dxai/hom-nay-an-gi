@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { RotateCw, Soup } from "lucide-react";
+import { Loader2, RotateCw, Soup } from "lucide-react";
 import { DishCard } from "@/components/DishCard";
 import { DishThumb } from "@/components/DishImage";
 import { MealChips } from "@/components/MealChips";
@@ -81,7 +81,10 @@ export default function Home() {
 
       <div aria-live="polite">
         {status === "loading" && (
-          <div className="h-48 animate-pulse rounded-3xl bg-gradient-to-br from-paper to-line" aria-label="Đang chọn món" />
+          <div className="card-glow flex h-48 flex-col items-center justify-center gap-3 rounded-3xl" role="status">
+            <Loader2 aria-hidden className="size-8 animate-spin text-ember" />
+            <p className="animate-pulse font-semibold text-muted">Đang chọn món…</p>
+          </div>
         )}
         {status === "error" && (
           <div className="card-glow rounded-3xl p-6 text-center">
