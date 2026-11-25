@@ -1,18 +1,75 @@
 @import "tailwindcss";
 
+/* Palette from Vietnamese food: ớt (chili), than hồng (ember), nghệ (turmeric), rau thơm (herb) on rice-paper cream. */
 :root {
-  --background: #fff8f0;
-  --foreground: #2b1d12;
+  --cream: #fbf5ec;
+  --paper: #fffdf8;
+  --ink: #2a1e17;
+  --muted: #7d6a58;
+  --line: #ecdcc8;
+  --chili: #b8322a;
+  --ember: #e0663a;
+  --turmeric: #e8a33d;
+  --herb: #4f7a4a;
+  --glow: #fbdcc4;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #1a130d;
-    --foreground: #f5ebe0;
+    --cream: #1b1411;
+    --paper: #261c17;
+    --ink: #f6ebdf;
+    --muted: #b9a593;
+    --line: #3a2c24;
+    --chili: #e0574b;
+    --ember: #f08453;
+    --turmeric: #f2b552;
+    --herb: #5f8f58;
+    --glow: #3a2118;
   }
 }
 
+@theme inline {
+  --color-cream: var(--cream);
+  --color-paper: var(--paper);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-chili: var(--chili);
+  --color-ember: var(--ember);
+  --color-turmeric: var(--turmeric);
+  --color-herb: var(--herb);
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
+  color: var(--ink);
+  background:
+    radial-gradient(120% 60% at 50% -10%, var(--glow) 0%, transparent 60%),
+    radial-gradient(80% 40% at 100% 100%, color-mix(in srgb, var(--turmeric) 14%, transparent) 0%, transparent 70%),
+    var(--cream);
+  background-attachment: fixed;
+}
+
+.text-gradient-warm {
+  background: linear-gradient(100deg, var(--chili), var(--ember) 55%, var(--turmeric));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Button fills are fixed (not theme tokens) so white text stays >= 4.5:1 in light and dark. */
+.bg-gradient-warm {
+  background: linear-gradient(135deg, #c8502f, #a63d32);
+}
+
+.bg-gradient-herb {
+  background: linear-gradient(135deg, #55804c, #3f6a3a);
+}
+
+/* Card with a thin gradient border */
+.card-glow {
+  background:
+    linear-gradient(var(--paper), var(--paper)) padding-box,
+    linear-gradient(160deg, var(--turmeric), var(--ember) 45%, var(--line) 80%) border-box;
+  border: 1.5px solid transparent;
 }

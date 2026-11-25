@@ -70,24 +70,25 @@ export default function Home() {
     <main className="mx-auto flex w-full max-w-[480px] flex-col gap-6 px-4 py-10">
       <header className="text-center">
         <h1 className="flex items-center justify-center gap-2 text-3xl font-extrabold">
-          Hôm nay ăn gì? <Soup aria-hidden className="size-8 text-orange-600" />
+          <span className="text-gradient-warm">
+          Hôm nay ăn gì?</span> <Soup aria-hidden className="size-8 text-ember" />
         </h1>
-        <p className="mt-1 text-sm opacity-70">Để mình chọn giúp bạn</p>
+        <p className="mt-1 text-sm text-muted">Để mình chọn giúp bạn</p>
       </header>
 
       <MealChips active={meal} onPick={pickMeal} disabled={status === "loading"} />
 
       <div aria-live="polite">
         {status === "loading" && (
-          <div className="h-48 animate-pulse rounded-3xl bg-orange-100 dark:bg-stone-800" aria-label="Đang chọn món" />
+          <div className="h-48 animate-pulse rounded-3xl bg-gradient-to-br from-paper to-line" aria-label="Đang chọn món" />
         )}
         {status === "error" && (
-          <div className="rounded-3xl bg-red-50 p-6 text-center dark:bg-red-950">
+          <div className="card-glow rounded-3xl p-6 text-center">
             <p>{error}</p>
             <button
               type="button"
               onClick={() => meal && fetchSuggestion(meal)}
-              className="mt-4 inline-flex min-h-11 items-center gap-2 rounded-full bg-orange-600 px-5 font-semibold text-white"
+              className="mt-4 inline-flex min-h-11 items-center gap-2 rounded-full bg-gradient-warm px-5 font-semibold text-white shadow-md shadow-chili/25"
             >
               <RotateCw aria-hidden className="size-4" /> Thử lại
             </button>
@@ -100,13 +101,13 @@ export default function Home() {
         <>
           {suggestion.alternatives.length > 0 && (
             <div className="flex flex-wrap items-center justify-center gap-2 text-sm">
-              <span className="opacity-70">Hoặc:</span>
+              <span className="text-muted">Hoặc:</span>
               {suggestion.alternatives.map((d) => (
                 <button
                   key={d.name}
                   type="button"
                   onClick={() => swap(d)}
-                  className="min-h-11 rounded-full border border-orange-300 px-4 hover:bg-orange-50 dark:border-stone-700 dark:hover:bg-stone-800"
+                  className="min-h-11 rounded-full border border-line bg-paper px-4 transition hover:border-turmeric hover:text-chili"
                 >
                   {d.name}
                 </button>
@@ -116,7 +117,7 @@ export default function Home() {
           <button
             type="button"
             onClick={() => meal && fetchSuggestion(meal)}
-            className="mx-auto inline-flex min-h-12 items-center gap-2 rounded-full bg-orange-600 px-8 text-lg font-semibold text-white shadow hover:bg-orange-700"
+            className="mx-auto inline-flex min-h-12 items-center gap-2 rounded-full bg-gradient-warm px-8 text-lg font-semibold text-white shadow-lg shadow-chili/30 transition hover:brightness-110 active:scale-[0.98]"
           >
             <RotateCw aria-hidden className="size-5" /> Đổi món
           </button>

@@ -12,8 +12,8 @@ export function MealChips({ active, onPick, disabled }: { active: Meal | null; o
           onClick={() => onPick(m)}
           className={`min-h-11 rounded-full px-4 text-sm font-semibold transition disabled:opacity-60 ${
             m === active
-              ? "bg-orange-600 text-white shadow"
-              : "bg-orange-100 text-orange-900 hover:bg-orange-200 dark:bg-orange-950 dark:text-orange-100"
+              ? "bg-gradient-warm text-white shadow-md shadow-chili/25"
+              : "border border-line bg-paper text-muted hover:border-ember hover:text-chili"
           }`}
         >
           {MEAL_LABELS[m]}
