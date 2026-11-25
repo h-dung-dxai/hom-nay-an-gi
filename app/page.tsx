@@ -1,9 +1,10 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Loader2, RotateCw, Soup } from "lucide-react";
+import { RotateCw, Soup } from "lucide-react";
 import { DishCard } from "@/components/DishCard";
 import { DishThumb } from "@/components/DishImage";
+import { ThinkingLoader } from "@/components/ThinkingLoader";
 import { MealChips } from "@/components/MealChips";
 import { mealFromHour, type Meal } from "@/lib/meal";
 import { errorText, FALLBACK_ERROR, recentExclude, type Dish, type Suggestion } from "@/lib/suggestion";
@@ -81,10 +82,7 @@ export default function Home() {
 
       <div aria-live="polite">
         {status === "loading" && (
-          <div className="card-glow flex h-48 flex-col items-center justify-center gap-3 rounded-3xl" role="status">
-            <Loader2 aria-hidden className="size-8 animate-spin text-ember" />
-            <p className="animate-pulse font-semibold text-muted">Đang chọn món…</p>
-          </div>
+          <ThinkingLoader />
         )}
         {status === "error" && (
           <div className="card-glow rounded-3xl p-6 text-center">
